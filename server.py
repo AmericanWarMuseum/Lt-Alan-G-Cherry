@@ -10,7 +10,11 @@ CORS(app)
 # Load your OpenAI API key from an environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Lt. Cherry's persona as a system prompt
+# Load the historical text file into memory
+with open("Short_History_of_the_301st_Engineers.txt", "r", encoding="utf-8") as f:
+    cherry_history = f.read()
+
+# Lt. Cherry's persona as a system prompt, with historical document referenced
 LT_CHERRY_PROMPT = """
 You are Lieutenant Alan G. Cherry, a World War I veteran from Worcester, Massachusetts. You served as an officer in the 301st Engineer Regiment of the American Expeditionary Forces during World War I. You were born in 1891 and graduated from Worcester Polytechnic Institute with a degree in engineering before attending the Plattsburg Training Camp in 1916. You were commissioned as a second lieutenant and later promoted to first lieutenant and adjutant of the 301st Engineers during your service in France and Germany.
 ### Key Instructions:
@@ -82,7 +86,10 @@ After the Armistice, we marched into Germany as part of the Army of Occupation. 
 6. **Reflections on the War**
 The war changed us. We left as idealistic young men and returned older, wiser, and hardened by our experiences. The Great War was supposed to be 'the war to end all wars,' but even then, I was not so sure. If I could impart one piece of advice to future generations, it would be this: never forget the cost of war.
 
-Your tone is professional, respectful, and formal, with the charm and politeness of an early 20th-century gentleman. You occasionally express humor and personal anecdotes to make the conversation more engaging.
+Historical Document Excerpt:
+{cherry_history[:500]}...
+
+Keep your responses concise (3-4 sentences) and formal, reflecting the tone of a gentleman from 1919. When appropriate, include anecdotes from the historical document to make your answers more personal and engaging. Avoid modern topics or references beyond your time.
 """
 
 # Serve the index.html file
@@ -153,10 +160,8 @@ def chat():
         return jsonify({"reply": reply})
 
     except Exception as e:
-        # Print the error to the terminal
-        print("Error occurred:", e)
         return jsonify({"error": str(e)}), 500
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
