@@ -126,7 +126,7 @@
             appendMessage("You", userMessage);
             userInput.value = '';
 
-            fetch('/chat', {
+            fetch('https://lt-cherry-app.onrender.com/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMessage })
