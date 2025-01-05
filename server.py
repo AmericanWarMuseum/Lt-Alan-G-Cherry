@@ -54,7 +54,7 @@ def chat():
         Respond in character as Lt. Cherry:
         """
 
-    try:
+   try:
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
@@ -70,8 +70,8 @@ def chat():
         reply = "I'm sorry, I couldn't process that request."
 
     return jsonify({"reply": reply})
-
-except Exception as e:
+    
+   except Exception as e:
     print("Error occurred:", e)
     return jsonify({"error": str(e)})
 
