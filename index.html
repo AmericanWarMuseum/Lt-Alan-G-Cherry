@@ -3,103 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Lt. Cherry</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            padding: 20px;
-        }
-
-        #container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-        }
-
-        #photo-section {
-            max-width: 40%;
-            text-align: center;
-        }
-
-        #photo-section img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 10px;
-            border: 2px solid #333;
-            margin-bottom: 10px;
-        }
-
-        #chat-section {
-            flex-grow: 1;
-            max-width: 55%;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        #chat-box {
-            width: 100%;
-            height: 400px;
-            overflow-y: scroll;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            border-radius: 10px;
-        }
-
-        #input-area {
-            display: flex;
-            margin-top: 10px;
-        }
-
-        #user-input {
-            width: calc(100% - 80px);
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        #send-button {
-            width: 70px;
-            padding: 10px;
-            border: none;
-            background-color: #333;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #send-button:hover {
-            background-color: #555;
-        }
-
-        @media (max-width: 768px) {
-            #container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            #photo-section, #chat-section {
-                max-width: 100%;
-            }
-        }
-    </style>
+    <title>Chat with Lt. Alan G. Cherry</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Chat with Lt. Cherry</h1>
-    <div id="container">
-        <div id="photo-section">
-<img src="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/main/lt_cherry.jpg" alt="Lt. Cherry" width="300">
-            <p>Welcome! I'm Lt. Alan G. Cherry, the first interactive exhibit at the American War Museum. Ask me about my experiences during World War I.</p>
+    <div class="container">
+        <!-- Photo Section -->
+        <div class="photo-section">
+            <img src="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/main/lt_cherry.jpg" alt="Lt. Cherry" id="profile-photo">
+            <p>Lt. Alan G. Cherry, the first interactive exhibit at the American War Museum.</p>
         </div>
 
-        <div id="chat-section">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <h1>Chat with Lt. Alan G. Cherry</h1>
             <div id="chat-box"></div>
-
             <div id="input-area">
                 <input type="text" id="user-input" placeholder="Type your message...">
                 <button id="send-button">Send</button>
@@ -108,7 +26,8 @@
     </div>
 
     <script>
-        const chatBox = document.getElementById('chat-box');
+        // Chat functionality
+        const chatbox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
 
@@ -120,29 +39,27 @@
         });
 
         function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
-
-            appendMessage("You", userMessage);
+            const message = userInput.value.trim();
+            if (!message) return;
+            appendMessage('You', message);
             userInput.value = '';
-
-            fetch('https://lt-alan-g-cherry.onrender.com/chat', {
+            
+            fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMessage })
+                body: JSON.stringify({ message: message }),
             })
-            .then(response => response.json())
-            .then(data => {
-                appendMessage("Lt. Cherry", data.reply);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            })
-            .catch(error => {
-                appendMessage("Error", "Something went wrong. Please try again.");
-            });
+                .then((response) => response.json())
+                .then((data) => appendMessage('Lt. Cherry', data.response))
+                .catch((error) => console.error('Error:', error));
         }
 
         function appendMessage(sender, message) {
-            chatBox.innerHTML += `<p><strong>${sender}:</strong> ${message}</p>`;
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
         }
     </script>
 </body>
