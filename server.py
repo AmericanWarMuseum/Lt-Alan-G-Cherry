@@ -54,7 +54,7 @@ def chat():
         Respond in character as Lt. Cherry:
         """
 
-        try:
+    try:
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
@@ -77,4 +77,5 @@ except Exception as e:
 
 # Run the app
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
