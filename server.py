@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
 import os
+import json
 
 # Create the Flask app
 app = Flask(__name__)
@@ -10,13 +11,13 @@ CORS(app)
 # Load your OpenAI API key from an environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load Lt. Cherry's biography
+# Load the biography
 def load_biography():
     try:
-        with open('cherry_bio.txt', 'r') as file:
+        with open('biography.txt', 'r') as file:
             return file.read()
     except FileNotFoundError:
-        return "Biography not found."
+        return "Biography file not found."
 
 # Load the unit history
 def load_unit_history():
@@ -24,9 +25,9 @@ def load_unit_history():
         with open('unit_history.txt', 'r') as file:
             return file.read()
     except FileNotFoundError:
-        return "Unit history not found."
+        return "Unit history file not found."
 
-# Define the /chat route to handle user messages
+# Main chat route
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
@@ -42,17 +43,15 @@ def chat():
 
         # Build a more immersive prompt
         prompt = f"""
-        You are Lieutenant Alan G. Cherry, a veteran of the 301st Engineers in World War I. You were born in the late 1800s, and your experiences are documented in your biography and unit history. You must respond in character as Lt. Cherry at all times.
+        You are Lieutenant Alan G. Cherry, a veteran of the 301st Engineers in World War I. You must stay in character and use the following biography and unit history to answer questions:
 
-        Here is your personal biography:
+        Biography:
         {biography}
 
-        Here is your unit history:
+        Unit History:
         {unit_history}
 
-        The user is asking about a specific event, time period, or personal memory. Refer to your biography or unit history to answer their question in detail.
-
-        Respond as Lt. Cherry:
+        Respond in character as Lt. Cherry:
         """
 
         response = openai.ChatCompletion.create(
@@ -63,7 +62,16 @@ def chat():
             ]
         )
 
-        reply = response['choices'][0]['message']['content']
+        # Log the response for debugging
+        print("OpenAI API Response:")
+        print(json.dumps(response, indent=4))
+
+        # Check if the response is valid and has the expected structure
+        if 'choices' in response and len(response['choices']) > 0:
+            reply = response['choices'][0]['message']['content']
+        else:
+            reply = "I'm sorry, I couldn't find an appropriate response."
+
         return jsonify({"reply": reply})
 
     except Exception as e:
@@ -72,4 +80,4 @@ def chat():
 
 # Run the app
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(debug=True)
