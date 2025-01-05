@@ -12,17 +12,20 @@ CORS(app)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Load the biography
-def load_file_content(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.read()
+def load_biography():
+    try:
+        with open('biography.txt', 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        return "Biography file not found."
 
-# Load the biography and unit history
-biography = load_file_content("biography.txt")
-unit_history = load_file_content("unit_history.txt")
-
-# Combine both into a single context
-full_context = biography + "\n" + unit_history
-
+# Load the unit history
+def load_unit_history():
+    try:
+        with open('unit_history.txt', 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        return "Unit history file not found."
 
 # Main chat route
 @app.route('/chat', methods=['POST'])
@@ -39,13 +42,17 @@ def chat():
         unit_history = load_unit_history()
 
         # Build a more immersive prompt
-        system_prompt = f"""
-You are Lieutenant Alan G. Cherry, a Corps Engineer in the 301st Engineers during World War I. You have access to your full biography and the unit history as documented in the files. Use this information to respond authentically as Lt. Cherry, providing historical context and personal anecdotes based on the documents.
+        prompt = f"""
+        You are Lieutenant Alan G. Cherry, a veteran of the 301st Engineers in World War I. You must stay in character and use the following biography and unit history to answer questions:
 
-Here is your context:
-{full_context}
-"""
+        Biography:
+        {biography}
 
+        Unit History:
+        {unit_history}
+
+        Respond in character as Lt. Cherry:
+        """
 
         response = openai.ChatCompletion.create(
             model="gpt-4",
