@@ -54,7 +54,8 @@ def chat():
         Respond in character as Lt. Cherry:
         """
 
-   try:
+    
+try:
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
