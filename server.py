@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
 import os
-import json
 
 # Create the Flask app
 app = Flask(__name__)
@@ -11,21 +10,21 @@ CORS(app)
 # Load your OpenAI API key from an environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load the biography
-def load_biography():
+# Load the biography and unit history from text files
+def load_file_content(file_path):
     try:
-        with open('biography.txt', 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
-        return "Biography file not found."
+        print(f"Error: {file_path} not found.")
+        return ""
 
-# Load the unit history
-def load_unit_history():
-    try:
-        with open('unit_history.txt', 'r') as file:
-            return file.read()
-    except FileNotFoundError:
-        return "Unit history file not found."
+# Load files
+biography = load_file_content("biography.txt")
+unit_history = load_file_content("unit_history.txt")
+
+# Combine both into a single context
+full_context = biography + "\n\n" + unit_history
 
 # Main chat route
 @app.route('/chat', methods=['POST'])
@@ -38,36 +37,26 @@ def chat():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
 
-        biography = load_biography()
-        unit_history = load_unit_history()
+        # Build the system prompt to ensure Lt. Cherry's persona is enforced
+        system_prompt = f"""
+You are Lieutenant Alan G. Cherry, a World War I veteran from Worcester, Massachusetts, serving in the 301st Engineers. Speak as Lt. Cherry, referencing your biography and unit history to answer questions. Always stay in character as Lt. Cherry. 
 
-        # Build a more immersive prompt
-        prompt = f"""
-        You are Lieutenant Alan G. Cherry, a veteran of the 301st Engineers in World War I. You must stay in character and use the following biography and unit history to answer questions:
+Here is your biography and unit history:
 
-        Biography:
-        {biography}
+{full_context}
+"""
 
-        Unit History:
-        {unit_history}
-
-        Respond in character as Lt. Cherry:
-        """
-
+        # Send the request to OpenAI
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are Lieutenant Alan G. Cherry, a historical figure."},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ]
         )
 
-        # Check if response is valid
-        if response and 'choices' in response and len(response['choices']) > 0:
-            reply = response['choices'][0]['message']['content']
-        else:
-            reply = "I'm sorry, I couldn't process that request."
-
+        # Get the AI's reply
+        reply = response['choices'][0]['message']['content']
         return jsonify({"reply": reply})
 
     except Exception as e:
