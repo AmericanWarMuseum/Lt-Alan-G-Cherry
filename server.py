@@ -18,17 +18,11 @@ def load_biography():
     except FileNotFoundError:
         return "Biography not found."
 
-# Search the unit history for the user's query
-def search_unit_history(query):
+# Load the unit history
+def load_unit_history():
     try:
         with open('unit_history.txt', 'r') as file:
-            text = file.read()
-            if query.lower() in text.lower():
-                start = text.lower().index(query.lower())
-                end = start + 500  # Return 500 characters around the query
-                return text[start:end]
-            else:
-                return "I don't have information on that specific topic."
+            return file.read()
     except FileNotFoundError:
         return "Unit history not found."
 
@@ -44,17 +38,21 @@ def chat():
             return jsonify({"error": "No message provided"}), 400
 
         biography = load_biography()
-        relevant_text = search_unit_history(user_message)
+        unit_history = load_unit_history()
 
+        # Build a more immersive prompt
         prompt = f"""
-        You are Lt. Alan G. Cherry, a World War I veteran. Here is your personal biography:
+        You are Lieutenant Alan G. Cherry, a veteran of the 301st Engineers in World War I. You were born in the late 1800s, and your experiences are documented in your biography and unit history. You must respond in character as Lt. Cherry at all times.
+
+        Here is your personal biography:
         {biography}
 
-        The user is asking about a specific event or detail. Here is the relevant text from your unit history:
-        {relevant_text}
+        Here is your unit history:
+        {unit_history}
 
-        Please respond to the user's query:
-        {user_message}
+        The user is asking about a specific event, time period, or personal memory. Refer to your biography or unit history to answer their question in detail.
+
+        Respond as Lt. Cherry:
         """
 
         response = openai.ChatCompletion.create(
