@@ -54,29 +54,26 @@ def chat():
         Respond in character as Lt. Cherry:
         """
 
-    
-try:
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": biography},
-            {"role": "user", "content": user_message}
-        ]
-    )
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are Lieutenant Alan G. Cherry, a historical figure."},
+                {"role": "user", "content": user_message}
+            ]
+        )
 
-    # Check if response is valid
-    if response and 'choices' in response and len(response['choices']) > 0:
-        reply = response['choices'][0]['message']['content']
-    else:
-        reply = "I'm sorry, I couldn't process that request."
+        # Check if response is valid
+        if response and 'choices' in response and len(response['choices']) > 0:
+            reply = response['choices'][0]['message']['content']
+        else:
+            reply = "I'm sorry, I couldn't process that request."
 
-    return jsonify({"reply": reply})
-    
-   except Exception as e:
-    print("Error occurred:", e)
-    return jsonify({"error": str(e)})
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        print("Error occurred:", e)
+        return jsonify({"error": str(e)})
 
 # Run the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
