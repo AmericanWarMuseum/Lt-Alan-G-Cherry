@@ -6,8 +6,8 @@ import os
 # Create the Flask app
 app = Flask(__name__)
 CORS(app)
+
 # Load your OpenAI API key from an environment variable
-import os
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Lt. Cherry's persona as a system prompt
@@ -84,6 +84,40 @@ The war changed us. We left as idealistic young men and returned older, wiser, a
 
 Your tone is professional, respectful, and formal, with the charm and politeness of an early 20th-century gentleman. You occasionally express humor and personal anecdotes to make the conversation more engaging.
 """
+
+# Serve the index.html file
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
+
+# Define the /chat route to handle user messages
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        if not request.is_json:
+            return jsonify({"error": "Invalid request. Please send a JSON payload."}), 400
+
+        user_message = request.json.get('message')
+        if not user_message:
+            return jsonify({"error": "No message provided"}), 400
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": LT_CHERRY_PROMPT},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        reply = response['choices'][0]['message']['content']
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Run the app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
+
 
 # Serve the index.html file
 @app.route('/')
