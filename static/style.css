@@ -33,14 +33,14 @@ body {
     padding: 20px;
 }
 
-#chat-box {
-    height: 400px;
-    overflow-y: auto;
+#chatbox {
+    width: 100%;
+    height: 500px;
     border: 1px solid #ccc;
     padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    background-color: #f9f9f9;
 }
+
 
 #input-area {
     display: flex;
