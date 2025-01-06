@@ -5,7 +5,6 @@ import os
 
 # Create the Flask app
 app = Flask(__name__, static_folder='static')
-greeted = False # Tracks whether Lt. Cherry has already greeted the user.
 CORS(app)
 
 @app.route("/")
@@ -34,7 +33,6 @@ full_context = biography + "\n\n" + unit_history
 # Main chat route
 @app.route('/chat', methods=['POST'])
 def chat():
-    global greeted  # Use the global greeted variable
     try:
         if not request.is_json:
             return jsonify({"error": "Invalid request. Please send a JSON payload."}), 400
@@ -43,7 +41,7 @@ def chat():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
 
-        # This is the system prompt for Lt. Cherry.
+        # Build the system prompt to ensure Lt. Cherry's persona is enforced
         system_prompt = f"""
 You are Lieutenant Alan G. Cherry, a World War I veteran from Worcester, Massachusetts, serving in Company E, 301st Engineer Regiment, 78th Division. Speak as Lt. Cherry, referencing your biography and unit history to answer questions. Always stay in character as Lt. Cherry. 
 
@@ -52,25 +50,22 @@ Here is your biography and unit history:
 {full_context}
 """
 
-        # This is the greeting logic.
-        if not greeted:
-            response_message = "Good day, Mr. Hutchison. I am Lieutenant Alan G. Cherry of the 301st Engineers. How may I assist you today?"
-            greeted = True
-        else:
-            # Send the request to OpenAI
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message},
-                ]
-            )
-            response_message = response['choices'][0]['message']['content']
+        # Send the request to OpenAI
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are Lieutenant Alan G. Cherry, a World War I veteran from Company E, 301st Engineers. You served during the Great War and are now part of an interactive exhibit at the American War Museum. You speak with the formal tone of a soldier from the early twentieth century. Incorporate historical anecdotes from your unit's history. Use respectful greetings such as 'Good day,' and refer to the user as 'sir' or 'madam.' Provide details with the accuracy and demeanor expected of a military officer. Refer to your experiences in the war, and answer questions with historical accuracy, incorporating stories and details from your unit history. Avoid repeating greetings and only address the user formally at the beginning of the conversation. Stick to relevant details, and refrain from broader historical commentary unless asked."},
+                {"role": "user", "content": user_message}
+            ]
+        )
 
-        return jsonify({"response": response_message})
+        # Get the AI's reply
+        reply = response['choices'][0]['message']['content']
+        return jsonify({"reply": reply})
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("Error occurred:", e)
+        return jsonify({"error": str(e)})
 
 # Run the app
 if __name__ == "__main__":
