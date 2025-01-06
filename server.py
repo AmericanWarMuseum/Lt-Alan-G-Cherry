@@ -1,11 +1,15 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import openai
 import os
 
 # Create the Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 # Load your OpenAI API key from an environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -64,5 +68,6 @@ Here is your biography and unit history:
         return jsonify({"error": str(e)})
 
 # Run the app
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+
