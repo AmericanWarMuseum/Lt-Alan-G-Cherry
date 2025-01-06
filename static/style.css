@@ -1,14 +1,8 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 20px;
-}
-
 .container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
 }
 
 .photo-section {
@@ -41,10 +35,10 @@ body {
     background-color: #f9f9f9;
 }
 
-
 #input-area {
     display: flex;
     gap: 10px;
+    margin-top: 20px;
 }
 
 #user-input {
@@ -70,4 +64,12 @@ body {
 .message {
     padding: 5px;
     border-bottom: 1px solid #ccc;
+}
+
+@media (max-width: 768px) {
+    .photo-section,
+    .chat-section {
+        width: 100%;
+        margin-right: 0;
+    }
 }
