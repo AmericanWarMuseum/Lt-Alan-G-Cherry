@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with Lt. Alan G. Cherry</title>
-	<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/refs/heads/main/static/style.css">
+    <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/main/static/style.css">
 </head>
 <body>
     <div class="container">
-        <!-- Photo Section -->
-        <div class="photo-section">
-<img src="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/refs/heads/main/static/lt_cherry.jpg" alt="Lt. Cherry">
-            <p>Lt. Alan G. Cherry, the first interactive exhibit at the American War Museum.</p>
+        <div class="left-panel">
+            <!-- Photo Section -->
+            <div class="photo-section">
+                <img src="https://raw.githubusercontent.com/AmericanWarMuseum/Lt-Alan-G-Cherry/main/static/lt_cherry.jpg" alt="Lt. Cherry">
+                <p>Lt. Alan G. Cherry, the first interactive exhibit at the American War Museum.</p>
+            </div>
         </div>
-
-        <!-- Chat Section -->
-        <div class="chat-section">
-            <h1>Chat with Lt. Alan G. Cherry</h1>
+        <div class="right-panel">
             <div id="chat-box"></div>
             <div id="input-area">
                 <input type="text" id="user-input" placeholder="Type your message...">
@@ -45,15 +44,13 @@
             userInput.value = '';
             
             fetch('https://lt-alan-g-cherry.onrender.com/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message })
-})
-
-
-                .then((response) => response.json())
-                .then((data) => appendMessage('Lt. Cherry', data.response))
-                .catch((error) => console.error('Error:', error));
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            })
+            .then((response) => response.json())
+            .then((data) => appendMessage('Lt. Cherry', data.response))
+            .catch((error) => console.error('Error:', error));
         }
 
         function appendMessage(sender, message) {
